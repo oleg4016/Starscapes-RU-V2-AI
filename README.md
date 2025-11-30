@@ -1,2 +1,4 @@
 # Starscapes-RU-V2-AI
-Оригинальный проект: [Deep-Fold](https://github.com/Deep-Fold) Переработка: [Gelo4016] с помощью aI.
+Автора оригинального проекта: [Deep-Fold](https://github.com/Deep-Fold)
+Оригинальный проект: [Deep-Fold](https://github.com/Deep-Fold/Starscapes)  
+Переделка от: [Gelo4016] с помощью aI.

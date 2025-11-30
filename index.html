@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор Звездных Пейзажей</title>
+  
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #1a1b1e;
+      --sidebar-bg: #25262b;
+      --text-color: #e9ecef;
+      --accent-color: #4dabf7;
+      --border-color: #373a40;
+      --input-bg: #2c2e33;
+    }
+
+    body {
+      padding: 0;
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Сайдбар */
+    aside {
+      width: 360px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    aside h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-color);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .control-group {
+      background: rgba(255,255,255,0.03);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+    }
+
+    .control-group h4 {
+      margin: 0 0 15px 0;
+      font-size: 0.9rem;
+      color: #adb5bd;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Сетка цветов с чекбоксами */
+    .color-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .color-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .color-row label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--accent-color);
+      cursor: pointer;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch {
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+
+    /* Инпуты */
+    input[type="number"], input[type="text"], select {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .input-row { margin-bottom: 10px; }
+    .input-row label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      color: #909296;
+    }
+
+    .ratio-buttons { display: flex; gap: 5px; margin-bottom: 10px; }
+    .ratio-buttons button { flex: 1; padding: 8px 4px; font-size: 0.7rem; }
+
+    .secondary-btn {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: #adb5bd;
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+.secondary-btn:hover {
+      background-color: transparent; /* Важно: отменяем заливку фона */
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      box-shadow: 0 0 8px rgba(77, 171, 247, 0.4); /* Добавим свечение для красоты */
+    }
+
+    .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+
+    button {
+      background-color: var(--input-bg);
+      color: white;
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+    }
+    button:hover {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      color: #fff;
+    }
+    button.primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+    button.primary:hover { background-color: #339af0; }
+
+    .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .radio-grid div { display: flex; align-items: center; gap: 5px; }
+    .radio-grid label { cursor: pointer; font-size: 0.8rem; }
+
+    main {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: radial-gradient(#2c2e33 1px, transparent 1px);
+      background-size: 20px 20px;
+      overflow: auto;
+      padding: 20px;
+      position: relative;
+    }
+
+    #container {
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      border: 2px solid #fff;
+      position: relative;
+    }
+
+    #loadingStatus {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 10px 25px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      border: 1px solid var(--accent-color);
+      z-index: 100;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    #loadingStatus.active { opacity: 1; }
+	/* --- Стилизация Скроллбара --- */
+    
+    /* Ширина скроллбара */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    /* Фон скроллбара (трек) */
+    ::-webkit-scrollbar-track {
+      background: var(--sidebar-bg); 
+    }
+
+    /* Ползунок (сам скролл) */
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: 4px;
+      border: 2px solid var(--sidebar-bg); /* Отступ от края */
+    }
+
+    /* Ползунок при наведении */
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #5c5f66;
+    }
+
+    /* Поддержка Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) var(--sidebar-bg);
+    }
+	/* --- Блок авторов (Кредиты) --- */
+    .credits {
+      margin-top: 20px; /* Отступ сверху */
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color); /* Тонкая линия разделитель */
+      font-size: 0.7rem; /* Мелкий шрифт */
+      color: #5c5f66; /* Ненавязчивый серый цвет */
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .credits a {
+      color: #909296;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .credits a:hover {
+      color: var(--accent-color); /* Подсветка при наведении */
+    }
+  </style>
+
+  <script src="p5.min.js"></script>
+  <script src="StarParticle.js"></script>
+  <script src="PaintParticle.js"></script>
+  <script src="FieldDrawer.js"></script>
+  <script src="fields.js"></script>
+  <script src="index.js"></script>
+  <script src="sketch.js"></script>
+</head>
+
+<body>
+
+  <aside>
+    <h2>Звездные пейзажи</h2>
+
+    <!-- Темы и Цвета -->
+    <div class="control-group">
+      <h4>
+        Слои и Цвета
+        <button class="secondary-btn" onclick="randomizeColors()" title="Случайные цвета">🎲 Случайный</button>
+      </h4>
+      
+<div class="input-row">
+          <label>Пресеты</label>
+          <select id="presetSelect" onchange="applyPreset(this.value)">
+            <option value="" disabled selected>Выберите тему...</option>
+            
+            <optgroup label="Природа">
+              <option value="default">Стандартный (Альпы)</option>
+              <option value="sunset">Пурпурный Закат</option>
+              <option value="midnight">Полночь в лесу</option>
+              <option value="arctic">Северный Полюс</option>
+              <option value="desert">Пустыня Сахара</option>
+              <option value="swamp">Туманное Болото</option>
+            </optgroup>
+
+            <optgroup label="Космос и Фантастика">
+              <option value="cyberpunk">Киберпанк Неон</option>
+              <option value="mars">Красная Планета</option>
+              <option value="alien">Чужой Мир (Фиолетовый)</option>
+              <option value="toxic">Токсичная Пустошь</option>
+              <option value="void">Глубокий Космос</option>
+            </optgroup>
+
+            <optgroup label="Стилизация">
+              <option value="bw">Ч/Б Нуар</option>
+              <option value="sepia">Старое Фото (Сепия)</option>
+              <option value="blueprint">Чертеж (Синий)</option>
+              <option value="vaporwave">Vaporwave (Ретро)</option>
+              <option value="pastel">Сахарная Вата</option>
+              <option value="gold">Золотая Лихорадка</option>
+              <option value="blood">Кровавая Луна</option>
+              <option value="matrix">Матрица</option>
+            </optgroup>
+          </select>
+        </div>
+
+      <div class="color-list">
+        <!-- Небо -->
+        <div class="color-row">
+          <label><input type="checkbox" checked id="doSky"> Небо</label>
+          <div>
+            <input type="color" id="skyColor1" title="Основной"/>
+            <input type="color" id="skyColor2" title="Градиент"/>
+          </div>
+        </div>
+        
+        <!-- Акценты неба -->
+        <div class="color-row">
+          <label style="opacity: 0.7; margin-left: 24px;">Акценты</label>
+          <div>
+            <input type="color" id="skyAccentColor1"/>
+            <input type="color" id="skyAccentColor2"/>
+          </div>
+        </div>
+
+        <!-- Звезды -->
+        <div class="color-row">
+          <label><input type="checkbox" checked id="doStars"> Звезды</label>
+          <div>
+            <input type="color" id="starColor1"/>
+            <input type="color" id="starColor2"/>
+          </div>
+        </div>
+
+        <!-- Горы -->
+        <div class="color-row">
+          <label><input type="checkbox" checked id="doMountains"> Горы</label>
+          <div>
+            <input type="color" id="mountainColor1"/>
+            <input type="color" id="mountainColor2"/>
+          </div>
+        </div>
+
+        <!-- Облака -->
+        <div class="color-row">
+          <label><input type="checkbox" checked id="doClouds"> Облака</label>
+          <input type="color" id="cloudColor1"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Режим -->
+    <div class="control-group">
+      <h4>Стиль отрисовки</h4>
+      <div class="radio-grid">
+        <div><input type="radio" name="mode" value="circles" checked id="modeCircles"><label for="modeCircles">Круги</label></div>
+        <div><input type="radio" name="mode" value="lines" id="modeLines"><label for="modeLines">Линии</label></div>
+        <div><input type="radio" name="mode" value="squares" id="modeSquares"><label for="modeSquares">Кубы</label></div>
+        <div><input type="radio" name="mode" value="crosses" id="modeCrosses"><label for="modeCrosses">Ткань</label></div>
+      </div>
+    </div>
+
+    <!-- Разрешение -->
+    <div class="control-group">
+      <h4>Разрешение</h4>
+      <div class="ratio-buttons">
+        <button class="secondary-btn" onclick="setRatio(540, 960)">📱 9:16</button>
+        <button class="secondary-btn" onclick="setRatio(960, 540)">🖥️ 16:9</button>
+        <button class="secondary-btn" onclick="setRatio(800, 800)">🟥 1:1</button>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <input type="number" value="600" min="100" id="resolutionX">
+        <input type="number" value="900" min="100" id="resolutionY">
+      </div>
+    </div>
+
+    <!-- Детализация -->
+    <div class="control-group">
+      <h4>Детализация (1-20)</h4>
+      <div class="input-row">
+        <label>Горы (ниже = дольше)</label>
+        <input type="number" value="5" min="1" id="mountainDetail">
+      </div>
+      <div class="input-row">
+        <label>Частицы (ниже = дольше)</label>
+        <input type="number" value="15" min="1" id="particleDetail">
+      </div>
+    </div>
+
+    <!-- Управление -->
+    <div class="control-group">
+      <h4>Генерация</h4>
+      <div class="input-row">
+        <label>Сид</label>
+        <input type="number" value="0" id="seedText">
+      </div>
+      
+      <div class="btn-group">
+        <button class="primary" onclick="generate()">Сгенерировать</button>
+        <button onclick="generateRandom()">Случайный Сид</button>
+        <button onclick="saveArt()" style="border-color: #51cf66; color: #51cf66;">Сохранить PNG</button>
+      </div>
+    </div>
+
+<div class="credits">
+      Оригинальный проект: <a href="https://github.com/Deep-Fold" target="_blank">Deep-Fold</a><br>
+      Переработка: <a href="https://github.com/oleg4016/Starscapes" target="_blank"><span>Gelo4016</span></a>
+    </div>
+
+  </aside>
+
+  <main>
+    <div id="loadingStatus">Ожидание...</div>
+    <div id='container'></div>
+  </main>
+
+</body>
+</html>
